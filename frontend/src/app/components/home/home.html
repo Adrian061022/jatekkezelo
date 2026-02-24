@@ -5,6 +5,70 @@
       <p *ngIf="total > 0" class="game-count">{{ total }} games available</p>
     </div>
 
+    <!-- Filters Section -->
+    <div class="filters-section">
+      <div class="filters-row">
+        <!-- Search Box -->
+        <div class="filter-group search-box">
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            (input)="onSearchChange()"
+            placeholder="🔍 Search games..."
+            class="filter-input"
+          />
+        </div>
+
+        <!-- Category Filter -->
+        <div class="filter-group">
+          <select 
+            [(ngModel)]="selectedCategoryId" 
+            (change)="onCategoryChange()"
+            class="filter-select"
+          >
+            <option [value]="undefined">All Categories</option>
+            <option *ngFor="let category of categories" [value]="category.id">
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Sort By -->
+        <div class="filter-group">
+          <select 
+            [(ngModel)]="sortBy" 
+            (change)="onSortChange()"
+            class="filter-select"
+          >
+            <option value="created_at">Sort by: Newest</option>
+            <option value="title">Sort by: Title</option>
+            <option value="price">Sort by: Price</option>
+          </select>
+        </div>
+
+        <!-- Sort Order -->
+        <div class="filter-group">
+          <select 
+            [(ngModel)]="sortOrder" 
+            (change)="onSortChange()"
+            class="filter-select"
+          >
+            <option value="desc">{{ sortBy === 'price' ? 'High to Low' : sortBy === 'title' ? 'Z to A' : 'Newest First' }}</option>
+            <option value="asc">{{ sortBy === 'price' ? 'Low to High' : sortBy === 'title' ? 'A to Z' : 'Oldest First' }}</option>
+          </select>
+        </div>
+
+        <!-- Clear Filters -->
+        <button 
+          (click)="clearFilters()" 
+          class="btn btn-clear"
+          *ngIf="searchQuery || selectedCategoryId || sortBy !== 'created_at' || sortOrder !== 'desc'"
+        >
+          Clear Filters
+        </button>
+      </div>
+    </div>
+
     <!-- Loading State -->
     <div *ngIf="isLoading" class="loading">
       <div class="spinner"></div>
@@ -20,8 +84,9 @@
     <div *ngIf="!isLoading && games.length === 0 && !errorMessage" class="empty-state">
       <div class="empty-icon">📦</div>
       <h2>No games found</h2>
-      <p>Be the first to add a game!</p>
-      <a *ngIf="authService.isLoggedIn" routerLink="/admin/game/create" class="btn btn-primary">
+      <p *ngIf="searchQuery || selectedCategoryId">Try adjusting your filters</p>
+      <p *ngIf="!searchQuery && !selectedCategoryId">Be the first to add a game!</p>
+      <a *ngIf="authService.isLoggedIn && isAdmin && !searchQuery && !selectedCategoryId" routerLink="/admin/game/create" class="btn btn-primary">
         Add Your First Game
       </a>
     </div>

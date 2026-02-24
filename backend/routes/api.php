@@ -14,6 +14,9 @@ Route::get('/test', function () {
 // Public routes
 Route::get('/games', [GameController::class, 'index']);
 Route::get('/games/{game}', [GameController::class, 'show']);
+Route::get('/categories', function () {
+    return \App\Models\Category::select('id', 'name', 'slug')->get();
+});
 
 // Auth routes
 Route::post('/register', [AuthController::class, 'register']);

@@ -1,24 +1,32 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { GameService } from '../../services/game.service';
+import { GameService, GameFilters, Category } from '../../services/game.service';
 import { AuthService } from '../../services/auth.service';
 import { Game, PaginatedGames } from '../../models/game.model';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './home.html',
   styleUrl: './home.scss',
   standalone: true
 })
 export class Home implements OnInit {
   games: Game[] = [];
+  categories: Category[] = [];
   isLoading: boolean = true;
   errorMessage: string = '';
   currentPage: number = 1;
   lastPage: number = 1;
   total: number = 0;
+
+  // Filters
+  searchQuery: string = '';
+  selectedCategoryId: number | undefined = undefined;
+  sortBy: 'created_at' | 'price' | 'title' = 'created_at';
+  sortOrder: 'asc' | 'desc' = 'desc';
 
   constructor(
     private gameService: GameService,
@@ -31,14 +39,33 @@ export class Home implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadCategories();
     this.loadGames();
+  }
+
+  loadCategories(): void {
+    this.gameService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+      }
+    });
   }
 
   loadGames(page: number = 1): void {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.gameService.getGames(page).subscribe({
+    const filters: GameFilters = {
+      search: this.searchQuery || undefined,
+      category_id: this.selectedCategoryId,
+      sort_by: this.sortBy,
+      sort_order: this.sortOrder
+    };
+
+    this.gameService.getGames(page, filters).subscribe({
       next: (response: PaginatedGames) => {
         this.games = response.data;
         this.currentPage = response.meta.current_page;
@@ -52,6 +79,30 @@ export class Home implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  onSearchChange(): void {
+    this.currentPage = 1;
+    this.loadGames(1);
+  }
+
+  onCategoryChange(): void {
+    this.currentPage = 1;
+    this.loadGames(1);
+  }
+
+  onSortChange(): void {
+    this.currentPage = 1;
+    this.loadGames(1);
+  }
+
+  clearFilters(): void {
+    this.searchQuery = '';
+    this.selectedCategoryId = undefined;
+    this.sortBy = 'created_at';
+    this.sortOrder = 'desc';
+    this.currentPage = 1;
+    this.loadGames(1);
   }
 
   viewGame(id: number): void {
