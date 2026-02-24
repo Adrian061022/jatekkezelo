@@ -1,1 +1,71 @@
-<p>game-details works!</p>
+<div class="details-container">
+  <div class="container">
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading">
+      <div class="spinner"></div>
+      <p>Loading game details...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage && !isLoading" class="error-state">
+      <div class="error-icon">❌</div>
+      <h2>{{ errorMessage }}</h2>
+      <button (click)="goBack()" class="btn btn-secondary">
+        ← Back to Games
+      </button>
+    </div>
+
+    <!-- Game Details -->
+    <div *ngIf="game && !isLoading" class="game-details">
+      <button (click)="goBack()" class="btn-back">
+        ← Back to Games
+      </button>
+
+      <div class="details-grid">
+        <div class="game-image-section">
+          <img 
+            [src]="game.cover_image || 'https://via.placeholder.com/600x280/1a1a2e/16213e?text=No+Image'" 
+            [alt]="game.title"
+            class="game-cover"
+          />
+        </div>
+
+        <div class="game-info-section">
+          <div class="game-header">
+            <div>
+              <span class="game-category">{{ game.category.name }}</span>
+              <h1 class="game-title">{{ game.title }}</h1>
+            </div>
+            <div class="game-price">${{ game.price }}</div>
+          </div>
+
+          <div class="game-description">
+            <h3>About This Game</h3>
+            <p>{{ game.description }}</p>
+          </div>
+
+          <div class="game-meta">
+            <div class="meta-item">
+              <span class="meta-label">Category</span>
+              <span class="meta-value">{{ game.category.name }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Release Date</span>
+              <span class="meta-value">{{ game.created_at | date:'mediumDate' }}</span>
+            </div>
+          </div>
+
+          <!-- Admin Actions -->
+          <div *ngIf="authService.isLoggedIn" class="admin-actions">
+            <button (click)="editGame()" class="btn btn-primary">
+              ✏️ Edit Game
+            </button>
+            <button (click)="deleteGame()" class="btn btn-danger">
+              🗑️ Delete Game
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
