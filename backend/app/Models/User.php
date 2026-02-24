@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -45,5 +46,31 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Games in user's library (purchased games)
+     */
+    public function games()
+    {
+        return $this->belongsToMany(Game::class, 'user_game')
+            ->withTimestamp('purchased_at')
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if user owns a game
+     */
+    public function ownsGame(int $gameId): bool
+    {
+        return $this->games()->where('game_id', $gameId)->exists();
     }
 }

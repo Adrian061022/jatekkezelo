@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GameController;
+use App\Http\Controllers\Api\LibraryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,8 +24,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
     
-    // Game management
-    Route::post('/games', [GameController::class, 'store']);
-    Route::put('/games/{game}', [GameController::class, 'update']);
-    Route::delete('/games/{game}', [GameController::class, 'destroy']);
+    // User Library
+    Route::get('/library', [LibraryController::class, 'index']);
+    Route::post('/library/purchase/{game}', [LibraryController::class, 'purchase']);
+    Route::get('/library/check/{game}', [LibraryController::class, 'checkOwnership']);
+    
+    // Admin only - Game management
+    Route::middleware('admin')->group(function () {
+        Route::post('/games', [GameController::class, 'store']);
+        Route::put('/games/{game}', [GameController::class, 'update']);
+        Route::delete('/games/{game}', [GameController::class, 'destroy']);
+    });
 });
