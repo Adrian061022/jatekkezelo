@@ -43,10 +43,14 @@ export class Register {
     this.authService.register(this.userData).subscribe({
       next: (response) => {
         console.log('Registration successful', response);
-        this.successMessage = 'Registration successful! Redirecting to login...';
+        // Save token and user data
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('currentUser', JSON.stringify(response.user));
+        
+        this.successMessage = 'Registration successful! Redirecting...';
         setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 2000);
+          this.router.navigate(['/']);
+        }, 1500);
       },
       error: (error) => {
         console.error('Registration error', error);

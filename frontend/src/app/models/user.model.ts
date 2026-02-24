@@ -23,6 +23,6 @@ export interface RegisterRequest {
 export interface AuthResponse {
   message: string;
   user: User;
-  access_token: string;
-  token_type: string;
+  token: string;
+  token_type?: string;
 }
