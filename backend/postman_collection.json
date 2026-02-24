@@ -1,0 +1,344 @@
+{
+	"info": {
+		"_postman_id": "steam-game-manager-api",
+		"name": "Steam-like Game Manager API",
+		"description": "Laravel REST API for Game Manager Application",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Public Endpoints",
+			"item": [
+				{
+					"name": "API Test",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/test",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"test"
+							]
+						},
+						"description": "Test if API is working"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Games",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/games",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"games"
+							]
+						},
+						"description": "Get all games with pagination"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single Game",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/games/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"games",
+								"1"
+							]
+						},
+						"description": "Get a single game by ID"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"auth_token\", jsonData.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"register"
+							]
+						},
+						"description": "Register a new user"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"auth_token\", jsonData.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "Login with existing user"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Protected Endpoints",
+			"item": [
+				{
+					"name": "Get Current User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"user"
+							]
+						},
+						"description": "Get authenticated user data"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"logout"
+							]
+						},
+						"description": "Logout and delete current token"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Game",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Cyberpunk 2077\",\n    \"description\": \"Cyberpunk 2077 is an open-world, action-adventure RPG set in the dark future of Night City — a dangerous megalopolis obsessed with power, glamor, and ceaseless body modification.\",\n    \"price\": 59.99,\n    \"cover_image\": \"https://via.placeholder.com/460x215/1a1a2e/16213e?text=Cyberpunk+2077\",\n    \"category_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/games",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"games"
+							]
+						},
+						"description": "Create a new game (requires authentication)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Game",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Cyberpunk 2077 - Updated Edition\",\n    \"description\": \"Updated description for Cyberpunk 2077\",\n    \"price\": 49.99,\n    \"cover_image\": \"https://via.placeholder.com/460x215/1a1a2e/16213e?text=Cyberpunk+2077+Updated\",\n    \"category_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/games/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"games",
+								"1"
+							]
+						},
+						"description": "Update an existing game (requires authentication)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Game",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/games/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"games",
+								"1"
+							]
+						},
+						"description": "Delete a game (requires authentication)"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

@@ -262,6 +262,23 @@ A public mappában lévő `.htaccess` fájl már tartalmazza a szükséges beál
 
 ## 🧪 Tesztelés
 
+### Postman Collection
+
+Importáld be a Postman collection-t a könnyebb teszteléshez:
+
+1. Nyisd meg a Postman-t
+2. Import → File → `postman_collection.json`
+3. Import → File → `postman_environment.json`
+4. Válaszd ki a "Game Manager - Local" environment-et
+5. Futtasd a "Login" request-et az admin userrel
+6. Az auth token automatikusan mentésre kerül
+
+**Default login:**
+- Email: `admin@example.com`
+- Password: `password`
+
+### cURL példák
+
 ```bash
 # API teszt
 curl http://localhost:8000/api/test
