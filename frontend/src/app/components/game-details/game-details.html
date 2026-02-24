@@ -55,8 +55,29 @@
             </div>
           </div>
 
+          <!-- Success/Error Messages -->
+          <div *ngIf="successMessage" class="alert alert-success">
+            {{ successMessage }}
+          </div>
+          <div *ngIf="errorMessage && !isLoading" class="alert alert-error">
+            {{ errorMessage }}
+          </div>
+
+          <!-- User Actions -->
+          <div *ngIf="authService.isLoggedIn && !isAdmin" class="user-actions">
+            <button 
+              *ngIf="!ownsGame && !checkingOwnership" 
+              (click)="purchaseGame()" 
+              class="btn btn-purchase">
+              🛒 Purchase for ${{ game.price }}
+            </button>
+            <div *ngIf="ownsGame" class="owned-badge">
+              ✅ You own this game
+            </div>
+          </div>
+
           <!-- Admin Actions -->
-          <div *ngIf="authService.isLoggedIn" class="admin-actions">
+          <div *ngIf="isAdmin" class="admin-actions">
             <button (click)="editGame()" class="btn btn-primary">
               ✏️ Edit Game
             </button>

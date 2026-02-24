@@ -5,6 +5,7 @@ import { Login } from './components/login/login';
 import { Register } from './components/register/register';
 import { GameDetails } from './components/game-details/game-details';
 import { GameForm } from './components/admin/game-form/game-form';
+import { LibraryComponent } from './components/library/library';
 
 export const routes: Routes = [
   {
@@ -21,6 +22,12 @@ export const routes: Routes = [
     path: 'register',
     component: Register,
     title: 'Register - Game Manager'
+  },
+  {
+    path: 'library',
+    component: LibraryComponent,
+    canActivate: [authGuard],
+    title: 'My Library - Game Manager'
   },
   {
     path: 'game/:id',

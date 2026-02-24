@@ -17,6 +17,10 @@ export class Navbar {
     private router: Router
   ) {}
 
+  get isAdmin(): boolean {
+    return this.authService.currentUserValue?.role === 'admin';
+  }
+
   logout(): void {
     this.authService.logout().subscribe({
       next: () => {

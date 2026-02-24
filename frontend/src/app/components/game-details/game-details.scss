@@ -164,6 +164,7 @@
           }
         }
 
+        .user-actions,
         .admin-actions {
           display: flex;
           gap: 1rem;
@@ -179,6 +180,17 @@
             cursor: pointer;
             transition: all 0.3s;
             font-size: 1rem;
+
+            &.btn-purchase {
+              background: linear-gradient(90deg, #5cb85c 0%, #4cae4c 100%);
+              color: #fff;
+
+              &:hover {
+                background: linear-gradient(90deg, #4cae4c 0%, #3d9c3d 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(92, 184, 92, 0.4);
+              }
+            }
 
             &.btn-primary {
               background: linear-gradient(90deg, #06bfff 0%, #2d73ff 100%);
@@ -202,6 +214,18 @@
                 transform: translateY(-2px);
               }
             }
+          }
+
+          .owned-badge {
+            flex: 1;
+            padding: 0.875rem;
+            background: rgba(92, 184, 92, 0.2);
+            border: 1px solid #5cb85c;
+            border-radius: 4px;
+            color: #5cb85c;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1rem;
           }
         }
       }

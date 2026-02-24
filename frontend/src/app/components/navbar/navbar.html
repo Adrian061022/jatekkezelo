@@ -13,11 +13,15 @@
       </a>
       
       <div *ngIf="authService.isLoggedIn" class="nav-links">
-        <a routerLink="/admin/game/create" routerLinkActive="active" class="nav-link">
+        <a routerLink="/library" routerLinkActive="active" class="nav-link">
+          My Library
+        </a>
+        <a *ngIf="isAdmin" routerLink="/admin/game/new" routerLinkActive="active" class="nav-link">
           Add Game
         </a>
         <span class="user-info">
           {{ authService.currentUserValue?.name }}
+          <span *ngIf="isAdmin" class="admin-badge">Admin</span>
         </span>
         <button (click)="logout()" class="btn-logout">
           Logout
