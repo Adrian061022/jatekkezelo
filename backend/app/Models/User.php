@@ -84,7 +84,7 @@ class User extends Authenticatable
     public function games()
     {
         return $this->belongsToMany(Game::class, 'user_game')
-            ->withTimestamp('purchased_at')
+            ->withPivot('purchased_at')
             ->withTimestamps();
     }
 
