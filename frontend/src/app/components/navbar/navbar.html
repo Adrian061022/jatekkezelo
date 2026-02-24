@@ -19,6 +19,12 @@
         <a *ngIf="isAdmin" routerLink="/admin/game/new" routerLinkActive="active" class="nav-link">
           Add Game
         </a>
+        <span class="balance-display">
+          💰 ${{ authService.currentUserValue?.balance || 0 }}
+        </span>
+        <button (click)="openAddFundsModal()" class="btn-add-funds">
+          + Add Funds
+        </button>
         <span class="user-info">
           {{ authService.currentUserValue?.name }}
           <span *ngIf="isAdmin" class="admin-badge">Admin</span>

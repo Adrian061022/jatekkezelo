@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/library', [LibraryController::class, 'index']);
     Route::post('/library/purchase/{game}', [LibraryController::class, 'purchase']);
     Route::get('/library/check/{game}', [LibraryController::class, 'checkOwnership']);
+    Route::post('/library/add-funds', [LibraryController::class, 'addFunds']);
     
     // Admin only - Game management
     Route::middleware('admin')->group(function () {

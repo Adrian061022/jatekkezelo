@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@example.com',
             'password' => bcrypt('password'),
             'role' => 'admin',
+            'balance' => 1000.00,
         ]);
 
         // Create regular test user
@@ -29,6 +30,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'user@example.com',
             'password' => bcrypt('password'),
             'role' => 'user',
+            'balance' => 500.00,
         ]);
 
         // Create categories

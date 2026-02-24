@@ -37,4 +37,14 @@ export class Library {
       `${this.apiUrl}/check/${gameId}`
     );
   }
+
+  /**
+   * Add funds to user balance
+   */
+  addFunds(amount: number): Observable<{ message: string; new_balance: number }> {
+    return this.http.post<{ message: string; new_balance: number }>(
+      `${this.apiUrl}/add-funds`,
+      { amount }
+    );
+  }
 }

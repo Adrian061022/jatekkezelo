@@ -75,9 +75,17 @@ export class GameDetails implements OnInit {
     if (!this.game) return;
 
     this.libraryService.purchaseGame(this.game.id).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         this.successMessage = response.message;
         this.ownsGame = true;
+        
+        // Update user balance
+        const currentUser = this.authService.currentUserValue;
+        if (currentUser && response.new_balance !== undefined) {
+          currentUser.balance = response.new_balance;
+          this.authService.updateCurrentUser(currentUser);
+        }
+        
         setTimeout(() => {
           this.successMessage = '';
         }, 3000);

@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'balance',
     ];
 
     /**
@@ -45,7 +46,28 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'balance' => 'decimal:2',
         ];
+    }
+
+    /**
+     * Add funds to user balance
+     */
+    public function addBalance(float $amount): void
+    {
+        $this->increment('balance', $amount);
+    }
+
+    /**
+     * Deduct funds from user balance
+     */
+    public function deductBalance(float $amount): bool
+    {
+        if ($this->balance >= $amount) {
+            $this->decrement('balance', $amount);
+            return true;
+        }
+        return false;
     }
 
     /**

@@ -32,6 +32,14 @@ export class AuthService {
     return !!this.token;
   }
 
+  /**
+   * Update current user
+   */
+  public updateCurrentUser(user: User): void {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    this.currentUserSubject.next(user);
+  }
+
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials)
       .pipe(

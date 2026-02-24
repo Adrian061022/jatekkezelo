@@ -26,6 +26,10 @@ export class Home implements OnInit {
     private router: Router
   ) {}
 
+  get isAdmin(): boolean {
+    return this.authService.currentUserValue?.role === 'admin';
+  }
+
   ngOnInit(): void {
     this.loadGames();
   }

@@ -33,15 +33,49 @@ class LibraryController extends Controller
             ], 400);
         }
 
-        // Add game to user's library
-        $user->games()->attach($game->id, [
-            'purchased_at' => now()
-        ]);
+        // Check if user has enough balance
+        if ($user->balance < $game->price) {
+            return response()->json([
+                'message' => 'Insufficient balance. Please add funds to your account.',
+                'required' => $game->price,
+                'current_balance' => $user->balance
+            ], 400);
+        }
+
+        // Deduct price from balance and add game to library
+        if ($user->deductBalance($game->price)) {
+            $user->games()->attach($game->id, [
+                'purchased_at' => now()
+            ]);
+
+            return response()->json([
+                'message' => 'Game purchased successfully',
+                'data' => new GameResource($game->load('category')),
+                'new_balance' => $user->fresh()->balance
+            ], 201);
+        }
 
         return response()->json([
-            'message' => 'Game purchased successfully',
-            'data' => new GameResource($game->load('category'))
-        ], 201);
+            'message' => 'Purchase failed'
+        ], 500);
+    }
+
+    /**
+     * Add funds to user balance
+     */
+    public function addFunds(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1|max:10000'
+        ]);
+
+        $user = $request->user();
+        $user->addBalance($request->amount);
+
+        return response()->json([
+            'message' => 'Funds added successfully',
+            'new_balance' => $user->fresh()->balance
+        ]);
     }
 
     /**

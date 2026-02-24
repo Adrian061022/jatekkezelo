@@ -46,7 +46,7 @@
           <div class="game-footer">
             <span class="game-price">${{ game.price }}</span>
             <button 
-              *ngIf="authService.isLoggedIn" 
+              *ngIf="isAdmin" 
               (click)="deleteGame(game.id, game.title); $event.stopPropagation()" 
               class="btn-delete"
               title="Delete game"
