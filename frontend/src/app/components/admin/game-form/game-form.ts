@@ -64,7 +64,7 @@ export class GameForm implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading game:', error);
+        console.error('Error while loading game:', error);
         this.errorMessage = 'Failed to load game';
         this.isLoading = false;
       }
