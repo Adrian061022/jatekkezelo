@@ -1,0 +1,70 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { RegisterRequest } from '../../models/user.model';
+
+@Component({
+  selector: 'app-register',
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './register.html',
+  styleUrl: './register.scss',
+  standalone: true
+})
+export class Register {
+  userData: RegisterRequest = {
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: ''
+  };
+  errorMessage: string = '';
+  successMessage: string = '';
+  isLoading: boolean = false;
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  onSubmit(): void {
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.isLoading = true;
+
+    // Check if passwords match
+    if (this.userData.password !== this.userData.password_confirmation) {
+      this.errorMessage = 'Passwords do not match';
+      this.isLoading = false;
+      return;
+    }
+
+    this.authService.register(this.userData).subscribe({
+      next: (response) => {
+        console.log('Registration successful', response);
+        // Save token and user data
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('currentUser', JSON.stringify(response.user));
+        
+        this.successMessage = 'Registration successful! Redirecting...';
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 1500);
+      },
+      error: (error) => {
+        console.error('Registration error', error);
+        this.errorMessage = error.error?.message || 'Registration failed. Please try again.';
+        if (error.error?.errors) {
+          // Handle Laravel validation errors
+          const errors = Object.values(error.error.errors).flat();
+          this.errorMessage = errors.join(', ');
+        }
+        this.isLoading = false;
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    });
+  }
+}

@@ -1,0 +1,47 @@
+<nav class="navbar">
+  <div class="container">
+    <div class="navbar-brand">
+      <a routerLink="/" class="logo">
+        <span class="logo-icon">🎮</span>
+        <span class="logo-text">GameStore</span>
+      </a>
+    </div>
+    
+    <div class="navbar-menu">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        Home
+      </a>
+      
+      <div *ngIf="authService.isLoggedIn" class="nav-links">
+        <a routerLink="/library" routerLinkActive="active" class="nav-link">
+          My Library
+        </a>
+        <a *ngIf="isAdmin" routerLink="/admin/game/new" routerLinkActive="active" class="nav-link">
+          Add Game
+        </a>
+        <span class="balance-display">
+          💰 ${{ authService.currentUserValue?.balance || 0 }}
+        </span>
+        <button (click)="openAddFundsModal()" class="btn-add-funds">
+          + Add Funds
+        </button>
+        <span class="user-info">
+          {{ authService.currentUserValue?.name }}
+          <span *ngIf="isAdmin" class="admin-badge">Admin</span>
+        </span>
+        <button (click)="logout()" class="btn-logout">
+          Logout
+        </button>
+      </div>
+      
+      <div *ngIf="!authService.isLoggedIn" class="nav-links">
+        <a routerLink="/login" routerLinkActive="active" class="nav-link">
+          Login
+        </a>
+        <a routerLink="/register" routerLinkActive="active" class="nav-link btn-register">
+          Register
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
