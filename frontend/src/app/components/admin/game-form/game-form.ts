@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GameService } from '../../../services/game.service';
+import { GameService, Category } from '../../../services/game.service';
 import { GameRequest } from '../../../models/game.model';
 
 @Component({
@@ -26,13 +26,7 @@ export class GameForm implements OnInit {
   errorMessage: string = '';
   successMessage: string = '';
 
-  categories = [
-    { id: 1, name: 'Action' },
-    { id: 2, name: 'Adventure' },
-    { id: 3, name: 'RPG' },
-    { id: 4, name: 'Strategy' },
-    { id: 5, name: 'Sports' }
-  ];
+  categories: Category[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -41,12 +35,24 @@ export class GameForm implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadCategories();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
       this.gameId = +id;
       this.loadGame(this.gameId);
     }
+  }
+
+  loadCategories(): void {
+    this.gameService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+      }
+    });
   }
 
   loadGame(id: number): void {
