@@ -1,14 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { GameService } from '../../services/game.service';
 import { AuthService } from '../../services/auth.service';
 import { Library } from '../../services/library';
+import { ReviewService } from '../../services/review.service';
 import { Game } from '../../models/game.model';
+import { Review, ReviewRequest } from '../../models/review.model';
 
 @Component({
   selector: 'app-game-details',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './game-details.html',
   styleUrl: './game-details.scss',
   standalone: true
@@ -20,12 +23,25 @@ export class GameDetails implements OnInit {
   successMessage: string = '';
   ownsGame: boolean = false;
   checkingOwnership: boolean = false;
+  
+  // Reviews
+  reviews: Review[] = [];
+  averageRating: number = 0;
+  totalReviews: number = 0;
+  loadingReviews: boolean = false;
+  userReview: Review | null = null;
+  isEditingReview: boolean = false;
+  reviewData: ReviewRequest = {
+    rating: 5,
+    comment: ''
+  };
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private gameService: GameService,
     private libraryService: Library,
+    private reviewService: ReviewService,
     public authService: AuthService
   ) {}
 
@@ -33,6 +49,7 @@ export class GameDetails implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadGame(+id);
+      this.loadReviews(+id);
     }
   }
 
@@ -48,6 +65,36 @@ export class GameDetails implements OnInit {
         console.error('Error loading game:', error);
         this.errorMessage = 'Game not found';
         this.isLoading = false;
+      }
+    });
+  }
+
+  loadReviews(gameId: number): void {
+    this.loadingReviews = true;
+    this.reviewService.getReviews(gameId).subscribe({
+      next: (response) => {
+        this.reviews = response.data;
+        this.averageRating = response.meta.average_rating;
+        this.totalReviews = response.meta.total_reviews;
+        
+        // Find user's review if exists
+        if (this.authService.isLoggedIn) {
+          const userId = this.authService.currentUserValue?.id;
+          this.userReview = this.reviews.find(r => r.user_id === userId) || null;
+          
+          if (this.userReview) {
+            this.reviewData = {
+              rating: this.userReview.rating,
+              comment: this.userReview.comment || ''
+            };
+          }
+        }
+        
+        this.loadingReviews = false;
+      },
+      error: (error) => {
+        console.error('Error loading reviews:', error);
+        this.loadingReviews = false;
       }
     });
   }
@@ -125,5 +172,102 @@ export class GameDetails implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/']);
+  }
+
+  // Review Methods
+  setRating(rating: number): void {
+    this.reviewData.rating = rating;
+  }
+
+  submitReview(): void {
+    if (!this.game) return;
+
+    if (this.userReview) {
+      // Update existing review
+      this.reviewService.updateReview(this.game.id, this.userReview.id, this.reviewData).subscribe({
+        next: (response) => {
+          this.successMessage = response.message;
+          this.loadReviews(this.game!.id);
+          this.isEditingReview = false;
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+        },
+        error: (error) => {
+          this.errorMessage = error.error?.message || 'Hiba az értékelés frissítése során';
+          setTimeout(() => {
+            this.errorMessage = '';
+          }, 3000);
+        }
+      });
+    } else {
+      // Create new review
+      this.reviewService.createReview(this.game.id, this.reviewData).subscribe({
+        next: (response) => {
+          this.successMessage = response.message;
+          this.loadReviews(this.game!.id);
+          this.reviewData = { rating: 5, comment: '' };
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+        },
+        error: (error) => {
+          this.errorMessage = error.error?.message || 'Hiba az értékelés létrehozása során';
+          setTimeout(() => {
+            this.errorMessage = '';
+          }, 3000);
+        }
+      });
+    }
+  }
+
+  cancelEditReview(): void {
+    if (this.userReview) {
+      this.reviewData = {
+        rating: this.userReview.rating,
+        comment: this.userReview.comment || ''
+      };
+    }
+    this.isEditingReview = false;
+  }
+
+  deleteReview(reviewId: number): void {
+    if (!this.game) return;
+    
+    if (!confirm('Biztosan törölni szeretnéd ezt az értékelést?')) {
+      return;
+    }
+
+    this.reviewService.deleteReview(this.game.id, reviewId).subscribe({
+      next: (response) => {
+        this.successMessage = response.message;
+        this.loadReviews(this.game!.id);
+        this.reviewData = { rating: 5, comment: '' };
+        setTimeout(() => {
+          this.successMessage = '';
+        }, 3000);
+      },
+      error: (error) => {
+        this.errorMessage = error.error?.message || 'Hiba az értékelés törlése során';
+        setTimeout(() => {
+          this.errorMessage = '';
+        }, 3000);
+      }
+    });
+  }
+
+  getStars(rating: number): boolean[] {
+    // Return array of 5 booleans, true for filled stars, false for empty
+    return Array(5).fill(false).map((_, i) => i < rating);
+  }
+
+  getRoundedRating(): number {
+    return Math.round(this.averageRating);
+  }
+
+  canEditReview(review: Review): boolean {
+    if (!this.authService.isLoggedIn) return false;
+    const userId = this.authService.currentUserValue?.id;
+    return review.user_id === userId || this.isAdmin;
   }
 }

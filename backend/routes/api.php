@@ -18,6 +18,7 @@ Route::get('/games/{game}', [GameController::class, 'show']);
 Route::get('/categories', function () {
     return \App\Models\Category::select('id', 'name', 'slug')->get();
 });
+Route::get('/users/{id}', [AuthController::class, 'getUserById']);
 
 // Reviews (public - anyone can view)
 Route::get('/games/{game}/reviews', [ReviewController::class, 'index']);

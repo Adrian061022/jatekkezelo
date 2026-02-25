@@ -6,6 +6,7 @@ import { Register } from './components/register/register';
 import { GameDetails } from './components/game-details/game-details';
 import { GameForm } from './components/admin/game-form/game-form';
 import { LibraryComponent } from './components/library/library';
+import { Profile } from './components/profile/profile';
 
 export const routes: Routes = [
   {
@@ -28,6 +29,17 @@ export const routes: Routes = [
     component: LibraryComponent,
     canActivate: [authGuard],
     title: 'My Library - Game Manager'
+  },
+  {
+    path: 'profile',
+    component: Profile,
+    canActivate: [authGuard],
+    title: 'Profil - Game Manager'
+  },
+  {
+    path: 'user/:id',
+    component: Profile,
+    title: 'Felhasználó profilja - Game Manager'
   },
   {
     path: 'game/:id',

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { User, LoginRequest, RegisterRequest, AuthResponse } from '../models/user.model';
+import { User, LoginRequest, RegisterRequest, AuthResponse, ProfileUpdateRequest } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -52,7 +52,14 @@ export class AuthService {
   }
 
   register(userData: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData);
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData)
+      .pipe(
+        tap(response => {
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('currentUser', JSON.stringify(response.user));
+          this.currentUserSubject.next(response.user);
+        })
+      );
   }
 
   logout(): Observable<any> {
@@ -72,5 +79,15 @@ export class AuthService {
 
   getCurrentUser(): Observable<{ user: User }> {
     return this.http.get<{ user: User }>(`${this.apiUrl}/user`);
+  }
+
+  updateProfile(profileData: ProfileUpdateRequest): Observable<AuthResponse> {
+    return this.http.put<AuthResponse>(`${this.apiUrl}/user/profile`, profileData)
+      .pipe(
+        tap(response => {
+          localStorage.setItem('currentUser', JSON.stringify(response.user));
+          this.currentUserSubject.next(response.user);
+        })
+      );
   }
 }

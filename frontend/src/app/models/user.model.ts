@@ -4,6 +4,8 @@ export interface User {
   email: string;
   role: 'user' | 'admin';
   balance: number;
+  profile_picture?: string;
+  bio?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -18,6 +20,12 @@ export interface RegisterRequest {
   email: string;
   password: string;
   password_confirmation: string;
+}
+
+export interface ProfileUpdateRequest {
+  name?: string;
+  profile_picture?: string;
+  bio?: string;
 }
 
 export interface AuthResponse {

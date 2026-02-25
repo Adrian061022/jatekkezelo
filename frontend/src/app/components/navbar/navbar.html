@@ -25,10 +25,12 @@
         <button (click)="openAddFundsModal()" class="btn-add-funds">
           + Add Funds
         </button>
-        <span class="user-info">
-          {{ authService.currentUserValue?.name }}
-          <span *ngIf="isAdmin" class="admin-badge">Admin</span>
-        </span>
+        <a routerLink="/profile" routerLinkActive="active" class="user-info-link">
+          <span class="user-info">
+            {{ authService.currentUserValue?.name }}
+            <span *ngIf="isAdmin" class="admin-badge">Admin</span>
+          </span>
+        </a>
         <button (click)="logout()" class="btn-logout">
           Logout
         </button>
