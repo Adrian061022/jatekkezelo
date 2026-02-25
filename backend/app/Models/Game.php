@@ -37,4 +37,12 @@ class Game extends Model
             ->withTimestamp('purchased_at')
             ->withTimestamps();
     }
+
+    /**
+     * Reviews for this game
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

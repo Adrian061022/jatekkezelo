@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GameController;
 use App\Http\Controllers\Api\LibraryController;
+use App\Http\Controllers\Api\ReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,9 @@ Route::get('/games/{game}', [GameController::class, 'show']);
 Route::get('/categories', function () {
     return \App\Models\Category::select('id', 'name', 'slug')->get();
 });
+
+// Reviews (public - anyone can view)
+Route::get('/games/{game}/reviews', [ReviewController::class, 'index']);
 
 // Auth routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -33,6 +37,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/library/purchase/{game}', [LibraryController::class, 'purchase']);
     Route::get('/library/check/{game}', [LibraryController::class, 'checkOwnership']);
     Route::post('/library/add-funds', [LibraryController::class, 'addFunds']);
+    
+    // Reviews (authenticated users can create, update, delete)
+    Route::post('/games/{game}/reviews', [ReviewController::class, 'store']);
+    Route::put('/games/{game}/reviews/{review}', [ReviewController::class, 'update']);
+    Route::delete('/games/{game}/reviews/{review}', [ReviewController::class, 'destroy']);
     
     // Admin only - Game management
     Route::middleware('admin')->group(function () {
