@@ -4,15 +4,18 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { Library } from '../../services/library';
 import { Router } from '@angular/router';
+import { PaymentModal } from '../payment-modal/payment-modal';
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, PaymentModal],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
   standalone: true
 })
 export class Navbar {
+  isPaymentModalOpen: boolean = false;
+
   constructor(
     public authService: AuthService,
     private libraryService: Library,
@@ -24,24 +27,30 @@ export class Navbar {
   }
 
   openAddFundsModal(): void {
-    const amount = prompt('Enter amount to add (e.g., 100):');
-    if (amount && !isNaN(+amount) && +amount > 0) {
-      this.libraryService.addFunds(+amount).subscribe({
-        next: (response) => {
-          alert(response.message);
-          // Update user balance in auth service
-          const currentUser = this.authService.currentUserValue;
-          if (currentUser) {
-            currentUser.balance = response.new_balance;
-            this.authService.updateCurrentUser(currentUser);
-          }
-        },
-        error: (error) => {
-          console.error('Error adding funds:', error);
-          alert('Failed to add funds. Please try again.');
+    this.isPaymentModalOpen = true;
+  }
+
+  closePaymentModal(): void {
+    this.isPaymentModalOpen = false;
+  }
+
+  onPaymentComplete(amount: number): void {
+    this.libraryService.addFunds(amount).subscribe({
+      next: (response) => {
+        // Update user balance in auth service
+        const currentUser = this.authService.currentUserValue;
+        if (currentUser) {
+          currentUser.balance = response.new_balance;
+          this.authService.updateCurrentUser(currentUser);
         }
-      });
-    }
+        this.isPaymentModalOpen = false;
+        alert(`✅ Sikeres fizetés! $${amount} hozzáadva az egyenlegedhez.`);
+      },
+      error: (error) => {
+        console.error('Error adding funds:', error);
+        alert('❌ Hiba történt a fizetés során. Kérlek próbáld újra.');
+      }
+    });
   }
 
   logout(): void {

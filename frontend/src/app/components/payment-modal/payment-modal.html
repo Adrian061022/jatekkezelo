@@ -1,0 +1,157 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>💳 Egyenleg feltöltés</h2>
+      <button class="close-btn" (click)="onClose()" [disabled]="isProcessing">×</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Amount Selection -->
+      <div class="section">
+        <label class="section-title">Válassz összeget</label>
+        <div class="amount-grid">
+          <button
+            *ngFor="let amt of amounts"
+            [class.active]="amount === amt"
+            (click)="selectAmount(amt)"
+            class="amount-btn"
+            [disabled]="isProcessing"
+          >
+            ${{ amt }}
+          </button>
+        </div>
+        <div class="custom-amount">
+          <label for="customAmount">Egyedi összeg:</label>
+          <input
+            id="customAmount"
+            type="number"
+            [(ngModel)]="amount"
+            min="1"
+            max="10000"
+            placeholder="$"
+            [disabled]="isProcessing"
+          />
+        </div>
+      </div>
+
+      <!-- Card Type Selection -->
+      <div class="section">
+        <label class="section-title">Kártya típusa</label>
+        <div class="card-types">
+          <button
+            *ngFor="let type of cardTypes"
+            [class.active]="cardType === type.value"
+            (click)="cardType = type.value"
+            class="card-type-btn"
+            [disabled]="isProcessing"
+          >
+            <span class="card-icon">{{ type.icon }}</span>
+            <span>{{ type.label }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Card Details -->
+      <div class="section">
+        <label class="section-title">Kártya adatok</label>
+        
+        <div class="form-group">
+          <label for="cardNumber">Kártyaszám</label>
+          <input
+            id="cardNumber"
+            type="text"
+            [(ngModel)]="cardNumber"
+            (input)="formatCardNumber()"
+            placeholder="1234 5678 9012 3456"
+            maxlength="19"
+            [disabled]="isProcessing"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="cardHolder">Kártyabirtokos neve</label>
+          <input
+            id="cardHolder"
+            type="text"
+            [(ngModel)]="cardHolder"
+            placeholder="KISS JÁNOS"
+            style="text-transform: uppercase"
+            [disabled]="isProcessing"
+            required
+          />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="expiryMonth">Lejárat</label>
+            <div class="expiry-group">
+              <select
+                id="expiryMonth"
+                [(ngModel)]="expiryMonth"
+                [disabled]="isProcessing"
+                required
+              >
+                <option value="">Hónap</option>
+                <option *ngFor="let month of months" [value]="month">{{ month }}</option>
+              </select>
+              <span class="separator">/</span>
+              <select
+                id="expiryYear"
+                [(ngModel)]="expiryYear"
+                [disabled]="isProcessing"
+                required
+              >
+                <option value="">Év</option>
+                <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cvv">CVV/CVC</label>
+            <input
+              id="cvv"
+              type="text"
+              [(ngModel)]="cvv"
+              (input)="formatCVV()"
+              placeholder="123"
+              maxlength="4"
+              [disabled]="isProcessing"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="error-message">
+        ⚠️ {{ errorMessage }}
+      </div>
+
+      <!-- Processing Message -->
+      <div *ngIf="isProcessing" class="processing-message">
+        <div class="spinner"></div>
+        <p>Fizetés feldolgozása...</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        class="btn btn-cancel"
+        (click)="onClose()"
+        [disabled]="isProcessing"
+      >
+        Mégse
+      </button>
+      <button
+        class="btn btn-pay"
+        (click)="processPayment()"
+        [disabled]="!isFormValid() || isProcessing"
+      >
+        <span *ngIf="!isProcessing">💰 Fizetés: ${{ amount }}</span>
+        <span *ngIf="isProcessing">Feldolgozás...</span>
+      </button>
+    </div>
+  </div>
+</div>

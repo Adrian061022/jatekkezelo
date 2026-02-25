@@ -47,3 +47,10 @@
     </div>
   </div>
 </nav>
+
+<!-- Payment Modal -->
+<app-payment-modal
+  [isOpen]="isPaymentModalOpen"
+  (close)="closePaymentModal()"
+  (paymentComplete)="onPaymentComplete($event)"
+></app-payment-modal>
