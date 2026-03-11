@@ -72,4 +72,37 @@ class AuthController extends Controller
             'user' => $request->user(),
         ]);
     }
+
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'profile_picture' => 'sometimes|nullable|url|max:500',
+            'bio' => 'sometimes|nullable|string|max:1000',
+        ]);
+
+        $user->update($request->only(['name', 'profile_picture', 'bio']));
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user' => $user->fresh(),
+        ]);
+    }
+
+    public function getUserById($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'user' => $user,
+        ]);
+    }
 }

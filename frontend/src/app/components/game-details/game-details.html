@@ -1,0 +1,277 @@
+<div class="details-container">
+  <div class="container">
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading">
+      <div class="spinner"></div>
+      <p>Loading game details...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage && !isLoading" class="error-state">
+      <div class="error-icon">❌</div>
+      <h2>{{ errorMessage }}</h2>
+      <button (click)="goBack()" class="btn btn-secondary">
+        ← Back to Games
+      </button>
+    </div>
+
+    <!-- Game Details -->
+    <div *ngIf="game && !isLoading" class="game-details">
+      <button (click)="goBack()" class="btn-back">
+        ← Back to Games
+      </button>
+
+      <div class="details-grid">
+        <div class="game-image-section">
+          <img 
+            [src]="game.cover_image || 'https://via.placeholder.com/600x280/1a1a2e/16213e?text=No+Image'" 
+            [alt]="game.title"
+            class="game-cover"
+          />
+        </div>
+
+        <div class="game-info-section">
+          <div class="game-header">
+            <div>
+              <span class="game-category">{{ game.category.name }}</span>
+              <h1 class="game-title">{{ game.title }}</h1>
+            </div>
+            <div class="game-price">${{ game.price }}</div>
+          </div>
+
+          <div class="game-description">
+            <h3>About This Game</h3>
+            <p>{{ game.description }}</p>
+          </div>
+
+          <div class="game-meta">
+            <div class="meta-item">
+              <span class="meta-label">Category</span>
+              <span class="meta-value">{{ game.category.name }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Release Date</span>
+              <span class="meta-value">{{ game.created_at | date:'mediumDate' }}</span>
+            </div>
+          </div>
+
+          <!-- Success/Error Messages -->
+          <div *ngIf="successMessage" class="alert alert-success">
+            {{ successMessage }}
+          </div>
+          <div *ngIf="errorMessage && !isLoading" class="alert alert-error">
+            {{ errorMessage }}
+          </div>
+
+          <!-- User Actions -->
+          <div *ngIf="authService.isLoggedIn && !isAdmin" class="user-actions">
+            <button 
+              *ngIf="!ownsGame && !checkingOwnership" 
+              (click)="purchaseGame()" 
+              class="btn btn-purchase">
+              🛒 Purchase for ${{ game.price }}
+            </button>
+            <div *ngIf="ownsGame" class="owned-badge">
+              ✅ You own this game
+            </div>
+          </div>
+
+          <!-- Admin Actions -->
+          <div *ngIf="isAdmin" class="admin-actions">
+            <button (click)="editGame()" class="btn btn-primary">
+              ✏️ Edit Game
+            </button>
+            <button (click)="deleteGame()" class="btn btn-danger">
+              🗑️ Delete Game
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews Section -->
+      <div class="reviews-section">
+        <div class="reviews-header">
+          <h2>Értékelések</h2>
+          <div class="rating-summary" *ngIf="totalReviews > 0">
+            <div class="average-rating">
+              <span class="rating-number">{{ averageRating.toFixed(1) }}</span>
+              <div class="stars">
+                <span *ngFor="let filled of getStars(getRoundedRating())" 
+                      [class.filled]="filled" 
+                      class="star">★</span>
+              </div>
+              <span class="review-count">{{ totalReviews }} értékelés</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Write Review Form -->
+        <div *ngIf="authService.isLoggedIn && !userReview" class="review-form">
+          <h3>Írd meg az értékelésedet</h3>
+          <form (ngSubmit)="submitReview()" #reviewForm="ngForm">
+            <div class="rating-input">
+              <label>Értékelés:</label>
+              <div class="star-rating">
+                <button 
+                  type="button"
+                  *ngFor="let star of [1,2,3,4,5]; let i = index" 
+                  (click)="setRating(star)"
+                  class="star-btn"
+                  [class.active]="star <= reviewData.rating"
+                >
+                  ★
+                </button>
+              </div>
+            </div>
+
+            <div class="comment-input">
+              <label for="comment">Vélemény (opcionális):</label>
+              <textarea
+                id="comment"
+                name="comment"
+                [(ngModel)]="reviewData.comment"
+                rows="4"
+                placeholder="Oszd meg a véleményedet a játékról..."
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" [disabled]="reviewData.rating === 0">
+              <span>📝</span> Értékelés közzététele
+            </button>
+          </form>
+        </div>
+
+        <!-- Edit Review Form -->
+        <div *ngIf="authService.isLoggedIn && userReview && isEditingReview" class="review-form">
+          <h3>Értékelés szerkesztése</h3>
+          <form (ngSubmit)="submitReview()" #editReviewForm="ngForm">
+            <div class="rating-input">
+              <label>Értékelés:</label>
+              <div class="star-rating">
+                <button 
+                  type="button"
+                  *ngFor="let star of [1,2,3,4,5]; let i = index" 
+                  (click)="setRating(star)"
+                  class="star-btn"
+                  [class.active]="star <= reviewData.rating"
+                >
+                  ★
+                </button>
+              </div>
+            </div>
+
+            <div class="comment-input">
+              <label for="edit-comment">Vélemény (opcionális):</label>
+              <textarea
+                id="edit-comment"
+                name="comment"
+                [(ngModel)]="reviewData.comment"
+                rows="4"
+                placeholder="Oszd meg a véleményedet a játékról..."
+              ></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" (click)="cancelEditReview()" class="btn btn-secondary">
+                <span>❌</span> Mégse
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="reviewData.rating === 0">
+                <span>💾</span> Mentés
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- User's Review Display -->
+        <div *ngIf="authService.isLoggedIn && userReview && !isEditingReview" class="user-review-display">
+          <h3>Az értékelésed</h3>
+          <div class="review-card own-review">
+            <div class="review-header">
+              <div class="user-info">
+                <img 
+                  [src]="userReview.user.profile_picture || 'https://via.placeholder.com/48/1a1a2e/16213e?text=' + userReview.user.name.charAt(0)" 
+                  [alt]="userReview.user.name"
+                  class="user-avatar"
+                  width="48"
+                  height="48"
+                />
+                <div>
+                  <span class="user-name">{{ userReview.user.name }} (Te)</span>
+                  <div class="stars small">
+                    <span *ngFor="let filled of getStars(userReview.rating)" 
+                          [class.filled]="filled" 
+                          class="star">★</span>
+                  </div>
+                </div>
+              </div>
+              <div class="review-actions">
+                <button (click)="isEditingReview = true" class="btn-icon edit">
+                  Szerkesztés
+                </button>
+                <button (click)="deleteReview(userReview.id)" class="btn-icon delete">
+                  Törlés
+                </button>
+              </div>
+            </div>
+            <p class="review-comment" *ngIf="userReview.comment">{{ userReview.comment }}</p>
+            <p class="review-date">{{ userReview.created_at | date:'medium' }}</p>
+          </div>
+        </div>
+
+        <!-- Reviews List -->
+        <div class="reviews-list">
+          <div *ngIf="loadingReviews" class="loading">
+            <div class="spinner"></div>
+            <p>Értékelések betöltése...</p>
+          </div>
+
+          <div *ngIf="!loadingReviews && reviews.length === 0" class="no-reviews">
+            <p>Még nincs értékelés ehhez a játékhoz.</p>
+            <p *ngIf="!authService.isLoggedIn">Jelentkezz be az első értékelés írásához!</p>
+          </div>
+
+          <div 
+            *ngFor="let review of reviews" 
+            class="review-card"
+            [class.own-review]="review.user_id === authService.currentUserValue?.id"
+          >
+            <!-- Skip user's own review as it's displayed separately -->
+            <ng-container *ngIf="review.user_id !== authService.currentUserValue?.id">
+              <div class="review-header">
+                <div class="user-info">
+                  <img 
+                    [src]="review.user.profile_picture || 'https://via.placeholder.com/48/1a1a2e/16213e?text=' + review.user.name.charAt(0)" 
+                    [alt]="review.user.name"
+                    class="user-avatar"
+                    width="48"
+                    height="48"
+                  />
+                  <div>
+                    <a [routerLink]="['/user', review.user.id]" class="user-name-link">
+                      <span class="user-name">{{ review.user.name }}</span>
+                    </a>
+                    <div class="stars small">
+                      <span *ngFor="let filled of getStars(review.rating)" 
+                            [class.filled]="filled" 
+                            class="star">★</span>
+                    </div>
+                  </div>
+                </div>
+                <button 
+                  *ngIf="isAdmin"
+                  (click)="deleteReview(review.id)" 
+                  class="btn-icon delete"
+                  title="Értékelés törlése (Admin)"
+                >
+                  Törlés
+                </button>
+              </div>
+              <p class="review-comment" *ngIf="review.comment">{{ review.comment }}</p>
+              <p class="review-date">{{ review.created_at | date:'medium' }}</p>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

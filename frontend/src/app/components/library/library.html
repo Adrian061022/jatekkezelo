@@ -1,0 +1,36 @@
+<div class="library-container">
+  <div class="library-header">
+    <h1>My Game Library</h1>
+    <p *ngIf="!isLoading">{{ games.length }} games in your library</p>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading your library...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <div *ngIf="!isLoading && games.length === 0" class="empty-library">
+    <p>Your library is empty</p>
+    <a routerLink="/" class="btn btn-primary">Browse Games</a>
+  </div>
+
+  <div *ngIf="!isLoading && games.length > 0" class="games-grid">
+    <div *ngFor="let game of games" class="game-card" (click)="viewGame(game.id)">
+      <div class="game-cover">
+        <img 
+          [src]="game.cover_image || 'https://via.placeholder.com/300x400?text=No+Image'" 
+          [alt]="game.title"
+        />
+      </div>
+      <div class="game-info">
+        <h3>{{ game.title }}</h3>
+        <p class="game-category">{{ game.category.name }}</p>
+        <p class="game-price">${{ game.price }}</p>
+      </div>
+    </div>
+  </div>
+</div>

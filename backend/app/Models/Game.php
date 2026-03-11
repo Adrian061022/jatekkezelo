@@ -27,4 +27,22 @@ class Game extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    /**
+     * Users who own this game
+     */
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_game')
+            ->withTimestamp('purchased_at')
+            ->withTimestamps();
+    }
+
+    /**
+     * Reviews for this game
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

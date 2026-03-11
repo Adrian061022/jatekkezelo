@@ -1,0 +1,155 @@
+<div class="profile-container">
+  <div class="container">
+    <button (click)="goBack()" class="btn-back">
+      ← Vissza
+    </button>
+
+    <div *ngIf="user" class="profile-card">
+      <div class="profile-header">
+        <h1>{{ isOwnProfile ? 'Profil' : user.name + ' profilja' }}</h1>
+        <button 
+          *ngIf="!isEditing && isOwnProfile" 
+          (click)="toggleEdit()" 
+          class="btn btn-edit"
+        >
+          ✏️ Szerkesztés
+        </button>
+      </div>
+
+      <!-- View Mode -->
+      <div *ngIf="!isEditing" class="profile-view">
+        <div class="profile-image-section">
+          <img 
+            [src]="user.profile_picture || 'https://via.placeholder.com/200/1a1a2e/16213e?text=' + user.name.charAt(0)" 
+            [alt]="user.name"
+            class="profile-picture"
+          />
+        </div>
+
+        <div class="profile-info-section">
+          <div class="info-group">
+            <label>Név</label>
+            <p class="info-value">{{ user.name }}</p>
+          </div>
+
+          <div class="info-group">
+            <label>Email</label>
+            <p class="info-value">{{ user.email }}</p>
+          </div>
+
+          <div class="info-group">
+            <label>Szerepkör</label>
+            <p class="info-value">
+              <span class="role-badge" [class.admin]="user.role === 'admin'">
+                {{ user.role === 'admin' ? 'Admin' : 'Felhasználó' }}
+              </span>
+            </p>
+          </div>
+
+          <div class="info-group">
+            <label>Egyenleg</label>
+            <p class="info-value balance">💰 ${{ user.balance }}</p>
+          </div>
+
+          <div class="info-group" *ngIf="user.bio">
+            <label>Bemutatkozás</label>
+            <p class="info-value bio">{{ user.bio }}</p>
+          </div>
+
+          <div class="info-group" *ngIf="!user.bio">
+            <label>Bemutatkozás</label>
+            <p class="info-value text-muted">Még nem adtál meg bemutatkozást</p>
+          </div>
+
+          <div class="info-group">
+            <label>Regisztrálva</label>
+            <p class="info-value">{{ user.created_at | date:'medium' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Mode -->
+      <div *ngIf="isEditing" class="profile-edit">
+        <form (ngSubmit)="onSubmit()" #profileForm="ngForm">
+          <div class="form-group">
+            <label for="name">Név *</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              [(ngModel)]="profileData.name"
+              required
+              minlength="3"
+              class="form-control"
+              [disabled]="isLoading"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="profile_picture">Profilkép URL</label>
+            <input
+              type="url"
+              id="profile_picture"
+              name="profile_picture"
+              [(ngModel)]="profileData.profile_picture"
+              class="form-control"
+              placeholder="https://example.com/your-picture.jpg"
+              [disabled]="isLoading"
+            />
+            <small class="hint">Add meg a profilképed URL-jét</small>
+          </div>
+
+          <div *ngIf="profileData.profile_picture" class="image-preview">
+            <p>Profilkép előnézet:</p>
+            <img 
+              [src]="profileData.profile_picture" 
+              alt="Preview" 
+              class="preview-img"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="bio">Bemutatkozás</label>
+            <textarea
+              id="bio"
+              name="bio"
+              [(ngModel)]="profileData.bio"
+              class="form-control"
+              rows="5"
+              placeholder="Írj magadról..."
+              [disabled]="isLoading"
+            ></textarea>
+            <small class="hint">Rövid bemutatkozás (opcionális)</small>
+          </div>
+
+          <div *ngIf="errorMessage" class="alert alert-error">
+            {{ errorMessage }}
+          </div>
+
+          <div *ngIf="successMessage" class="alert alert-success">
+            {{ successMessage }}
+          </div>
+
+          <div class="form-actions">
+            <button 
+              type="button" 
+              (click)="toggleEdit()" 
+              class="btn btn-secondary"
+              [disabled]="isLoading"
+            >
+              Mégse
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="profileForm.invalid || isLoading"
+            >
+              <span *ngIf="!isLoading">Mentés</span>
+              <span *ngIf="isLoading">Mentés...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

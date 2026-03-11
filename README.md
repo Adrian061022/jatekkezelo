@@ -1,164 +1,297 @@
-# Steam-szerű Játékkezelő Webalkalmazás
+# 🎮 Game Manager - Steam-inspired Web Application
 
-Modern játékkezelő alkalmazás Laravel backend és Angular frontend-del.
+Modern full-stack game management application with Steam-inspired UI design.
 
-## 📁 Projekt struktúra
+![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=flat-square&logo=laravel)
+![Angular](https://img.shields.io/badge/Angular-20.x-DD0031?style=flat-square&logo=angular)
+![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=flat-square&logo=php)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript)
+
+## 📋 Overview
+
+A production-ready web application for managing video game libraries with features inspired by the Steam platform. Built with Laravel 12 REST API backend and Angular 20 standalone components frontend.
+
+## ✨ Key Features
+
+- 🔐 **JWT Authentication** - Secure login/register with Laravel Sanctum
+- 🎮 **Game Management** - Full CRUD operations for game library
+- 📱 **Responsive Design** - Steam-themed dark UI optimized for all devices
+- 🔍 **Game Browsing** - Paginated game list with detailed views
+- 👤 **Admin Panel** - Protected routes for game creation and editing
+- 🖼️ **Image Preview** - Real-time cover image preview
+- ✅ **Form Validation** - Client and server-side validation
+- 🎨 **Modern UI/UX** - Steam-inspired gradient designs and animations
+
+## 📁 Project Structure
 
 ```
 jatekkezelo/
-├── backend/          # Laravel 12 REST API
-└── frontend/         # Angular alkalmazás (később)
+├── backend/                 # Laravel 12 REST API
+│   ├── app/
+│   │   ├── Http/
+│   │   │   ├── Controllers/Api/   # API Controllers
+│   │   │   ├── Resources/         # API Resources
+│   │   │   └── Requests/          # Form Requests
+│   │   └── Models/                # Eloquent Models
+│   ├── database/
+│   │   ├── migrations/            # Database schema
+│   │   ├── factories/             # Model factories
+│   │   └── seeders/               # Database seeders
+│   ├── routes/api.php             # API routes
+│   └── README.md                  # Backend documentation
+│
+└── frontend/                # Angular 20 Application
+    ├── src/
+    │   ├── app/
+    │   │   ├── components/        # UI Components
+    │   │   ├── services/          # API Services
+    │   │   ├── models/            # TypeScript Interfaces
+    │   │   ├── guards/            # Route Guards
+    │   │   ├── interceptors/      # HTTP Interceptors
+    │   │   └── app.routes.ts      # Route Configuration
+    │   ├── environments/          # Environment configs
+    │   └── styles.scss            # Global styles
+    └── README.md                  # Frontend documentation
 ```
 
-## 🚀 Gyors start
+## 🛠️ Tech Stack
 
 ### Backend
+- **Framework**: Laravel 12.x
+- **Language**: PHP 8.2+
+- **Database**: MySQL 8.0+
+- **Authentication**: Laravel Sanctum (API Tokens)
+- **API**: RESTful with JSON responses
+- **Testing**: PHPUnit, Pest
+
+### Frontend
+- **Framework**: Angular 20.2.1
+- **Language**: TypeScript 5.x
+- **State Management**: RxJS + Signals
+- **Styling**: SCSS with Steam theme
+- **HTTP Client**: HttpClient with interceptors
+- **Routing**: Angular Router with guards
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- PHP 8.2 or higher
+- Composer
+- Node.js 18+ and npm
+- MySQL 8.0+
+- Git
+
+### Backend Setup
 
 ```bash
+# Navigate to backend
 cd backend
+
+# Install dependencies
 composer install
+
+# Configure environment
 cp .env.example .env
+
+# Generate app key
 php artisan key:generate
+
+# Create database
+# Create 'jatekkezelo_db' in MySQL
+
+# Run migrations and seeders
 php artisan migrate:fresh --seed
+
+# Start development server
 php artisan serve
 ```
 
-Részletes dokumentáció: [backend/README.md](backend/README.md)
+Backend will run at: `http://localhost:8000`
 
-### Frontend (Coming soon)
+**Default Admin Credentials:**
+- Email: `admin@example.com`
+- Password: `password`
 
+### Frontend Setup
+
+```bash
+# Navigate to frontend
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+```
+
+Frontend will run at: `http://localhost:4200`
+
+## 📖 Documentation
+
+- **[Backend Documentation](backend/README.md)** - Laravel API setup and usage
+- **[Frontend Documentation](frontend/README.md)** - Angular app setup and architecture
+- **[API Documentation](backend/API_DOCUMENTATION.md)** - Complete API endpoint reference
+
+## 🔌 API Endpoints
+
+### Authentication
+- `POST /api/register` - Register new user
+- `POST /api/login` - Login user
+- `POST /api/logout` - Logout (auth required)
+- `GET /api/user` - Get current user (auth required)
+
+### Games
+- `GET /api/games` - List all games (paginated)
+- `GET /api/games/{id}` - Get single game
+- `POST /api/games` - Create game (auth required)
+- `PUT /api/games/{id}` - Update game (auth required)
+- `DELETE /api/games/{id}` - Delete game (auth required)
+
+## 🎨 Design System
+
+The application uses a Steam-inspired dark theme:
+
+### Color Palette
+- **Primary Background**: `#1b2838`
+- **Secondary Background**: `#2a475e`
+- **Primary Accent**: `#66c0f4` (Steam Blue)
+- **Secondary Accent**: `#1b8cd8`
+- **Text Primary**: `#ffffff`
+- **Text Secondary**: `#b8b8b8`
+
+### Typography
+- **Font Family**: Segoe UI, Tahoma, Geneva, Verdana, sans-serif
+- **Headings**: 300 font-weight with gradient text
+- **Body**: 400 font-weight
+
+## 🧪 Testing
+
+### Backend Tests
+```bash
+cd backend
+php artisan test
+```
+
+### Frontend Tests
 ```bash
 cd frontend
-npm install
-ng serve
+npm test
 ```
 
-## 📚 Dokumentáció
+## 📦 Deployment
 
-- [Backend README](backend/README.md)
-- [API Dokumentáció](backend/API_DOCUMENTATION.md)
+### Backend (Laravel)
 
-## 🎯 Funkciók
+1. Update `.env` for production
+2. Run migrations: `php artisan migrate --force`
+3. Cache config: `php artisan config:cache`
+4. Cache routes: `php artisan route:cache`
+5. Optimize: `php artisan optimize`
 
-### MVP (Minimum Viable Product)
+### Frontend (Angular)
 
-✅ **Backend (Laravel)**
-- REST API
-- Sanctum autentikáció
-- Game CRUD műveletek
-- Category rendszer
-- API Resources
-- Form Request validáció
-- Factory & Seeder
+1. Update `environment.prod.ts`
+2. Build: `npm run build`
+3. Deploy `dist/frontend` to web server
+4. Configure `.htaccess` for SPA routing
 
-⏳ **Frontend (Angular)** - Coming soon
-- Game lista
-- Game részletek
-- Login/Register
-- Admin interface
-- Token kezelés
-- Dark theme (Steam-like)
-
-## 🛠 Technológiák
-
-### Backend
+### Server Requirements
 - PHP 8.2+
-- Laravel 12.x
-- MySQL/MariaDB
-- Laravel Sanctum
-- RESTful API
+- MySQL 8.0+
+- Composer
+- Apache/Nginx
+- Node.js (for build)
 
-### Frontend (Tervezett)
-- Angular (latest)
-- TypeScript
-- RxJS
-- Angular Material/Bootstrap
-- HttpClient
+## 🔐 Security Features
 
-## 📦 Branch struktúra
+- ✅ CSRF Protection
+- ✅ SQL Injection Prevention (Eloquent ORM)
+- ✅ XSS Protection
+- ✅ JWT Token Authentication
+- ✅ Password Hashing (bcrypt)
+- ✅ Rate Limiting
+- ✅ CORS Configuration
+- ✅ Input Validation (Client & Server)
 
-- `main` - Production ready kód
-- `backend` - Backend fejlesztés
-- `frontend` - Frontend fejlesztés
-- `develop` - Development branch
+## 📱 Browser Support
 
-## 🚀 Deploy
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
 
-### FTP feltöltés
+## 🤝 Git Workflow
 
-1. Backend build:
-```bash
-cd backend
-composer install --optimize-autoloader --no-dev
-npm run build
-```
+This project uses a branch-based workflow:
 
-2. Fájlok feltöltése FTP-n (lásd: backend/README.md)
+- **backend** - Laravel API development
+- **frontend** - Angular app development
+- **main** - Production-ready merged code
 
-3. Szerver beállítások
-```bash
-php artisan config:cache
-php artisan route:cache
-php artisan migrate --force
-```
+## 📝 Database Schema
 
-## 📝 API Végpontok
+### Users Table
+- id, name, email, password, timestamps
 
-```
-GET    /api/test              - API teszt
-GET    /api/games             - Játékok listája
-GET    /api/games/{id}        - Játék részletei
-POST   /api/register          - Regisztráció
-POST   /api/login             - Bejelentkezés
+### Categories Table
+- id, name, slug, timestamps
 
-Protected (auth:sanctum):
-POST   /api/logout            - Kijelentkezés
-GET    /api/user              - User adatok
-POST   /api/games             - Új játék
-PUT    /api/games/{id}        - Játék szerkesztése
-DELETE /api/games/{id}        - Játék törlése
-```
+### Games Table
+- id, title, description, price, cover_image, category_id, timestamps
 
-Részletes API dokumentáció: [API_DOCUMENTATION.md](backend/API_DOCUMENTATION.md)
+### Relationships
+- Category `hasMany` Games
+- Game `belongsTo` Category
 
-## 👨‍💻 Fejlesztés
+## 🌟 Features by Role
 
-### Backend szerver indítása
-```bash
-cd backend
-php artisan serve
-```
+### Public Users
+- ✅ View game library
+- ✅ View game details
+- ✅ Register account
+- ✅ Login
 
-### Tesztelés
-```bash
-# API teszt
-curl http://localhost:8000/api/test
+### Authenticated Users (Admin)
+- ✅ All public features
+- ✅ Create new games
+- ✅ Edit existing games
+- ✅ Delete games
 
-# Login
-curl -X POST http://localhost:8000/api/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@example.com","password":"password"}'
-```
+## 🚧 Future Enhancements
 
-## 🔐 Default login adatok
+- [ ] User roles and permissions
+- [ ] Game categories filtering
+- [ ] Advanced search functionality
+- [ ] User wishlists
+- [ ] Game ratings and reviews
+- [ ] User profiles
+- [ ] Multi-language support
+- [ ] Dark/Light theme toggle
 
-```
-Email: admin@example.com
-Password: password
-```
+## 📄 License
 
-## 📄 Licenc
+This project is for educational purposes.
 
-MIT
+## 👨‍💻 Author
 
-## 🤝 Contributing
+**Adrian**  
+Full Stack Developer
 
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+- GitHub: [@Adrian061022](https://github.com/Adrian061022)
 
-## 📧 Kapcsolat
+## 🙏 Acknowledgments
 
-Project Link: [https://github.com/yourusername/jatekkezelo](https://github.com/yourusername/jatekkezelo)
+- Laravel Framework
+- Angular Framework
+- Steam (UI/UX inspiration)
+- Open source community
+
+## 📞 Support
+
+For issues, questions, or contributions, please open an issue on GitHub.
+
+---
+
+**Built with ❤️ using Laravel & Angular**

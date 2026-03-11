@@ -14,9 +14,35 @@ class GameController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $games = Game::with('category')->latest()->paginate(12);
+        $query = Game::with('category');
+
+        // Search by title or description
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by category
+        if ($request->has('category_id') && $request->input('category_id') != '') {
+            $query->where('category_id', $request->input('category_id'));
+        }
+
+        // Sort by created_at (newest/oldest) or price
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortOrder = $request->input('sort_order', 'desc');
+        
+        if (in_array($sortBy, ['created_at', 'price', 'title'])) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->latest();
+        }
+
+        $games = $query->paginate(12);
         return GameResource::collection($games);
     }
 
